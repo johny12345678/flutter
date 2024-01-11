@@ -1,5 +1,3 @@
-import 'dart:js';
-
 import 'package:cvapp/constants/routes.dart';
 import 'package:cvapp/firebase_options.dart';
 import 'package:cvapp/screens/login_screen.dart';
