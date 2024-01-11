@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "217666245776",
+    "project_id": "cvapp-75fa0",
+    "storage_bucket": "cvapp-75fa0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:217666245776:android:5307fac701973403df3415",
+        "android_client_info": {
+          "package_name": "com.cv.app.cvapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2343enSmAsKt6ErHP1WazBiOjkuIdkhc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
