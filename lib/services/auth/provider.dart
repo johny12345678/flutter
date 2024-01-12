@@ -1,6 +1,7 @@
 import 'package:cvapp/services/auth/user.dart';
 
 abstract class AuthProvider {
+  Future<void> initialize();
   AuthUser? get currentUser;
 
   Future<AuthUser> logIn({

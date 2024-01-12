@@ -1,4 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:cvapp/services/auth/service.dart';
 import 'package:flutter/material.dart';
 import 'package:cvapp/constants/routes.dart';
 
@@ -18,20 +20,17 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
       ),
       body: Column(
         children: [
-          const Text(
-              "Activate your account"),
-          const Text(
-              "Didn't get verification link? Click below"),
+          const Text("Activate your account"),
+          const Text("Didn't get verification link? Click below"),
           TextButton(
             onPressed: () async {
-              final user = FirebaseAuth.instance.currentUser;
-              await user?.sendEmailVerification();
+              await AuthService.firebase().sendEmailVerification();
             },
             child: const Text('Send email verification'),
           ),
           TextButton(
             onPressed: () async {
-              await FirebaseAuth.instance.signOut();
+              await AuthService.firebase().logout();
               Navigator.of(context).pushNamedAndRemoveUntil(
                 registerRoute,
                 (route) => false,
