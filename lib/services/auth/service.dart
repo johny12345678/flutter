@@ -1,9 +1,12 @@
+import 'package:cvapp/services/auth/firebase_auth_provider.dart';
 import 'package:cvapp/services/auth/provider.dart';
 import 'package:cvapp/services/auth/user.dart';
 
 class AuthService implements AuthProvider {
   final AuthProvider provider;
   AuthService(this.provider);
+
+  factory AuthService.firebase() => AuthService(FirebaseAuthProvider());
 
   @override
   Future<AuthUser> createAccount({
