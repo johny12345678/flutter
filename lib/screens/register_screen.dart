@@ -65,7 +65,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   email: email,
                   password: password,
                 );
-                final user = AuthService.firebase().currentUser;
                 AuthService.firebase().sendEmailVerification();
                 Navigator.of(context).pushNamed(verifyEmailRoute);
               } on WeakPasswordAuthException {
@@ -86,7 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
               } on GenericAuthException {
                 await errorDialog(
                   context,
-                  'error',
+                  'Register failed',
                 );
               }
             },
