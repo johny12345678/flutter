@@ -9,8 +9,65 @@ class DatabaseAlreadyOpenException implements Exception {}
 
 class UnableToGetDocDirectory implements Exception {}
 
+class DbIsNotOpen implements Exception {}
+
+class CouldNotDeleteUser implements Exception {}
+
+class UserAlreadyExists implements Exception {}
+
 class NotesService {
   Database? _db;
+
+  Future<DatabaseUser> createUser({required String email}) async {
+    final db = _getDatabaseOrThrow();
+    final result = await db.query(
+      userTable,
+      limit: 1,
+      where: 'email = ?',
+      whereArgs: [email.toLowerCase()],
+    );
+    if (result.isNotEmpty) {
+      throw UserAlreadyExists();
+    }
+    final userId = await db.insert(
+      userTable,
+      {emailColumn: email.toLowerCase()},
+    );
+    return DatabaseUser(id: userId, email: email);
+  }
+
+  Future<void> deleteUser({required String email}) async {
+    final db = _getDatabaseOrThrow();
+    final deletedCount = await db.delete(
+      userTable,
+      where: 'email = ?',
+      whereArgs: [email.toLowerCase()],
+    );
+    if (deletedCount != 1) {
+      throw CouldNotDeleteUser();
+    }
+  }
+
+  //internal func that there is no need to make everywhere same if else statement
+  Database _getDatabaseOrThrow() {
+    final db = _db;
+    if (db == null) {
+      throw DbIsNotOpen();
+    } else {
+      return db;
+    }
+  }
+
+  Future<void> close() async {
+    final db = _db;
+    if (db == null) {
+      throw DbIsNotOpen();
+    } else {
+      await db.close();
+      _db = null;
+    }
+  }
+
   Future<void> open() async {
     if (_db != null) {
       throw DatabaseAlreadyOpenException();
@@ -21,12 +78,8 @@ class NotesService {
       final db = await openDatabase(dbPath);
       _db = db;
 
-      const createUserTable = '''CREATE TABLE "user" (
-	"id"	INTEGER NOT NULL,
-	"email"	TEXT NOT NULL UNIQUE,
-	PRIMARY KEY("id" AUTOINCREMENT)
-)
-    ''';
+      await db.execute(createUserTable);
+      await db.execute(createNoteTable);
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocDirectory();
     }
@@ -97,3 +150,18 @@ const emailColumn = "email";
 const userIdColumn = "user_id";
 const textColumn = "text";
 const isSynchronized = "is_sync_with_server";
+
+const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
+"id"	INTEGER NOT NULL,
+"email"	TEXT NOT NULL UNIQUE,
+PRIMARY KEY("id" AUTOINCREMENT)
+)''';
+
+const createNoteTable = '''CREATE TABLE IF NOT EXISTS"note" (
+"id"	INTEGER NOT NULL,
+"user_id"	INTEGER NOT NULL,
+"text"	TEXT,
+"is_sync_with_server"	INTEGER NOT NULL DEFAULT 0,
+FOREIGN KEY("user_id") REFERENCES "user"("id"),
+PRIMARY KEY("id" AUTOINCREMENT)
+)''';
