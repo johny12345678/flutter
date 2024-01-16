@@ -10,6 +10,18 @@ import 'package:sqflite/sqflite.dart';
 class NotesService {
   Database? _db;
 
+  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+    try {
+      final user = await getUser(email: email);
+      return user;
+    } on CouldNotFindUser {
+      final createdUser = await createUser(email: email);
+      return createdUser;
+    } catch (e) {
+      rethrow; // for debug, can make breakpoint
+    }
+  }
+
   final _noteStreamController =
       StreamController<List<DatabaseNote>>.broadcast();
 
@@ -38,7 +50,11 @@ class NotesService {
     if (updateCount == 0) {
       throw CouldNotUpdateNote();
     } else {
-      return await getNote(id: note.id);
+      final updatedNote = await getNote(id: note.id);
+      _notes.removeWhere((element) => element.id == updatedNote.id);
+      _notes.add(updatedNote);
+      _noteStreamController.add(_notes);
+      return updatedNote;
     }
   }
 
