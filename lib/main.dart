@@ -1,5 +1,6 @@
 import 'package:cvapp/constants/routes.dart';
-import 'package:cvapp/screens/dashboard.dart';
+import 'package:cvapp/screens/note/new_node_screen.dart';
+import 'package:cvapp/screens/note/notes_screen.dart';
 import 'package:cvapp/screens/login_screen.dart';
 import 'package:cvapp/screens/register_screen.dart';
 import 'package:cvapp/screens/verify_email_screen.dart';
@@ -19,8 +20,9 @@ void main() {
       routes: {
         loginRoute: (context) => const LoginPage(),
         registerRoute: (context) => const RegisterPage(),
-        notesRoute: (context) => const Dashboard(),
+        notesRoute: (context) => const NoteScreen(),
         verifyEmailRoute: (context) => const VerifyEmailPage(),
+        newNoteRoute: (context) => const NewNoteScreen(),
       }));
 }
 
@@ -37,7 +39,7 @@ class HomePage extends StatelessWidget {
             final user = AuthService.firebase().currentUser;
             if (user != null) {
               if (user.isEmailVerified) {
-                return const Dashboard();
+                return const NoteScreen();
               } else {
                 return const VerifyEmailPage();
               }
