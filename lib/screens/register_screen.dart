@@ -1,9 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:cvapp/services/auth/exceptions.dart';
 import 'package:cvapp/services/auth/service.dart';
+import 'package:cvapp/utilities/dialogs/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:cvapp/constants/routes.dart';
-import 'package:cvapp/utilities/error_dialog.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);

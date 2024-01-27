@@ -1,5 +1,5 @@
 import 'package:cvapp/constants/routes.dart';
-import 'package:cvapp/screens/note/new_node_screen.dart';
+import 'package:cvapp/screens/note/create_update_note_view.dart';
 import 'package:cvapp/screens/note/notes_screen.dart';
 import 'package:cvapp/screens/login_screen.dart';
 import 'package:cvapp/screens/register_screen.dart';
@@ -14,7 +14,7 @@ void main() {
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        useMaterial3: false,
       ),
       home: const HomePage(),
       routes: {
@@ -22,7 +22,7 @@ void main() {
         registerRoute: (context) => const RegisterPage(),
         notesRoute: (context) => const NoteScreen(),
         verifyEmailRoute: (context) => const VerifyEmailPage(),
-        newNoteRoute: (context) => const NewNoteScreen(),
+        createUpdateNoteScreen: (context) => const CreateUpdateNoteScreen(),
       }));
 }
 

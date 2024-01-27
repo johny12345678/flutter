@@ -3,7 +3,7 @@
 import 'package:cvapp/constants/routes.dart';
 import 'package:cvapp/services/auth/exceptions.dart';
 import 'package:cvapp/services/auth/service.dart';
-import 'package:cvapp/utilities/error_dialog.dart';
+import 'package:cvapp/utilities/dialogs/error_dialog.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {

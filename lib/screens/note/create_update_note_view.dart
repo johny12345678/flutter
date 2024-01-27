@@ -1,22 +1,24 @@
+import 'package:cvapp/services/auth/cloud/cloud_note.dart';
+import 'package:cvapp/services/auth/cloud/firebase_cloud_storage.dart';
 import 'package:cvapp/services/auth/service.dart';
-import 'package:cvapp/services/crud/notes_service.dart';
+import 'package:cvapp/utilities/generics/get_arguments.dart';
 import 'package:flutter/material.dart';
 
-class NewNoteScreen extends StatefulWidget {
-  const NewNoteScreen({super.key});
+class CreateUpdateNoteScreen extends StatefulWidget {
+  const CreateUpdateNoteScreen({super.key});
 
   @override
-  State<NewNoteScreen> createState() => _NewNoteScreenState();
+  State<CreateUpdateNoteScreen> createState() => _CreateUpdateNoteScreenState();
 }
 
-class _NewNoteScreenState extends State<NewNoteScreen> {
-  DatabaseNote? _note;
-  late final NotesService _notesService;
+class _CreateUpdateNoteScreenState extends State<CreateUpdateNoteScreen> {
+  CloudNote? _note;
+  late final FirebaseCludStorage _notesService;
   late final TextEditingController _textController;
 
   @override
   void initState() {
-    _notesService = NotesService();
+    _notesService = FirebaseCludStorage();
     _textController = TextEditingController();
     super.initState();
   }
@@ -27,7 +29,7 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
       return;
     }
     final text = _textController.text;
-    await _notesService.updateNote(note: note, text: text);
+    await _notesService.updateNote(documentId: note.documentId, text: text);
   }
 
   void _setupTextControllerListener() {
@@ -35,21 +37,28 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
     _textController.addListener(_textControllerListener);
   }
 
-  Future<DatabaseNote> createNewNote() async {
+  Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
+    final widgetNote = context.getArgument<CloudNote>();
+    if (widgetNote != null) {
+      _note = widgetNote;
+      _textController.text = widgetNote.text;
+      return widgetNote;
+    }
     final existingNote = _note;
     if (existingNote != null) {
       return existingNote;
     }
     final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email!;
-    final owner = await _notesService.getUser(email: email);
-    return await _notesService.createNote(owner: owner);
+    final userId = currentUser.id;
+    final newNote = await _notesService.createNewNote(ownerUserId: userId);
+    _note = newNote;
+    return newNote;
   }
 
   void _deleteNoteIfTextIsEmpty() {
     final note = _note;
     if (_textController.text.isEmpty && note != null) {
-      _notesService.deleteNote(id: note.id);
+      _notesService.deleteNote(documentId: note.documentId);
     }
   }
 
@@ -57,14 +66,14 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
     final note = _note;
     final text = _textController.text;
     if (text.isNotEmpty && note != null) {
-      await _notesService.updateNote(note: note, text: text);
+      await _notesService.updateNote(documentId: note.documentId, text: text);
     }
   }
 
   @override
   void dispose() {
-    _deleteNoteIfTextIsEmpty();
     _saveNoteIfTextIsNotEmpty();
+    _deleteNoteIfTextIsEmpty();
     _textController.dispose();
     super.dispose();
   }
@@ -76,11 +85,10 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
         title: const Text('New note'),
       ),
       body: FutureBuilder(
-        future: createNewNote(),
+        future: createOrGetExistingNote(context),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              _note = snapshot.data as DatabaseNote;
               _setupTextControllerListener();
               return TextField(
                 controller: _textController,
