@@ -4,8 +4,12 @@ import 'package:cvapp/screens/note/notes_screen.dart';
 import 'package:cvapp/screens/login_screen.dart';
 import 'package:cvapp/screens/register_screen.dart';
 import 'package:cvapp/screens/verify_email_screen.dart';
-import 'package:cvapp/services/auth/service.dart';
+import 'package:cvapp/services/auth/bloc/auth_bloc.dart';
+import 'package:cvapp/services/auth/bloc/auth_event.dart';
+import 'package:cvapp/services/auth/bloc/auth_state.dart';
+import 'package:cvapp/services/auth/firebase_auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +20,10 @@ void main() {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: false,
       ),
-      home: const HomePage(),
+      home: BlocProvider<AuthBloc>(
+        create: (context) => AuthBloc(FirebaseAuthProvider()),
+        child: const HomePage(),
+      ),
       routes: {
         loginRoute: (context) => const LoginPage(),
         registerRoute: (context) => const RegisterPage(),
@@ -31,25 +38,47 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: AuthService.firebase().initialize(),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.done:
-            final user = AuthService.firebase().currentUser;
-            if (user != null) {
-              if (user.isEmailVerified) {
-                return const NoteScreen();
-              } else {
-                return const VerifyEmailPage();
-              }
-            } else {
-              return const LoginPage();
-            }
-          default:
-            return const CircularProgressIndicator();
+    context.read<AuthBloc>().add(const AuthEventInitialize());
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is AuthStateLoggedIn) {
+          return const NoteScreen();
+        } else if (state is AuthStateLoggedOut) {
+          return const LoginPage();
+        } else if (state is AuthStateNeedsVerification) {
+          return const VerifyEmailPage();
+        } else {
+          return const Scaffold(
+              body: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                Center(child: CircularProgressIndicator()),
+              ]));
         }
       },
     );
   }
 }
+  //   return FutureBuilder(
+  //     future: AuthService.firebase().initialize(),
+  //     builder: (context, snapshot) {
+  //       switch (snapshot.connectionState) {
+  //         case ConnectionState.done:
+  //           final user = AuthService.firebase().currentUser;
+  //           if (user != null) {
+  //             if (user.isEmailVerified) {
+  //               return const NoteScreen();
+  //             } else {
+  //               return const VerifyEmailPage();
+  //             }
+  //           } else {
+  //             return const LoginPage();
+  //           }
+  //         default:
+  //           return const CircularProgressIndicator();
+  //       }
+  //     },
+  //   );
+  // }
+

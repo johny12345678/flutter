@@ -1,8 +1,10 @@
 import 'package:cvapp/services/auth/cloud/cloud_note.dart';
 import 'package:cvapp/services/auth/cloud/firebase_cloud_storage.dart';
 import 'package:cvapp/services/auth/service.dart';
+import 'package:cvapp/utilities/dialogs/cannot_share_empty_note_dialog.dart';
 import 'package:cvapp/utilities/generics/get_arguments.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CreateUpdateNoteScreen extends StatefulWidget {
   const CreateUpdateNoteScreen({super.key});
@@ -83,6 +85,19 @@ class _CreateUpdateNoteScreenState extends State<CreateUpdateNoteScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New note'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final text = _textController.text;
+              if (_note == null || text.isEmpty) {
+                await showCannotShareEmptyNoteDialog(context);
+              } else {
+                Share.share(text);
+              }
+            },
+            icon: const Icon(Icons.share),
+          )
+        ],
       ),
       body: FutureBuilder(
         future: createOrGetExistingNote(context),
@@ -99,7 +114,12 @@ class _CreateUpdateNoteScreenState extends State<CreateUpdateNoteScreen> {
                 ),
               );
             default:
-              return const CircularProgressIndicator();
+              return const Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(child: CircularProgressIndicator()),
+                  ]);
           }
         },
       ),

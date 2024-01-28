@@ -1,11 +1,14 @@
 import 'package:cvapp/constants/routes.dart';
 import 'package:cvapp/enums/menu_action.dart';
 import 'package:cvapp/screens/note/notes_list_view.dart';
+import 'package:cvapp/services/auth/bloc/auth_bloc.dart';
+import 'package:cvapp/services/auth/bloc/auth_event.dart';
 import 'package:cvapp/services/auth/cloud/cloud_note.dart';
 import 'package:cvapp/services/auth/cloud/firebase_cloud_storage.dart';
 import 'package:cvapp/services/auth/service.dart';
 import 'package:cvapp/utilities/dialogs/log_out_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NoteScreen extends StatefulWidget {
   const NoteScreen({Key? key}) : super(key: key);
@@ -42,11 +45,10 @@ class _NoteScreenState extends State<NoteScreen> {
                   case MenuAction.logout:
                     final shouldLogout = await showLogOutDialog(context);
                     if (shouldLogout) {
-                      await AuthService.firebase().logout();
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        loginRoute,
-                        (_) => false,
-                      );
+                      // ignore: use_build_context_synchronously
+                      context.read<AuthBloc>().add(
+                            const AuthEventLogOut(),
+                          );
                     }
                 }
               },
@@ -83,10 +85,20 @@ class _NoteScreenState extends State<NoteScreen> {
                       },
                     );
                   } else {
-                    return const CircularProgressIndicator();
+                    return const Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(child: CircularProgressIndicator()),
+                        ]);
                   }
                 default:
-                  return const CircularProgressIndicator();
+                  return const Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(child: CircularProgressIndicator()),
+                      ]);
               }
             }));
   }

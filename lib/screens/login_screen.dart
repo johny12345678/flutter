@@ -1,10 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:cvapp/constants/routes.dart';
+import 'package:cvapp/services/auth/bloc/auth_bloc.dart';
+import 'package:cvapp/services/auth/bloc/auth_event.dart';
 import 'package:cvapp/services/auth/exceptions.dart';
-import 'package:cvapp/services/auth/service.dart';
 import 'package:cvapp/utilities/dialogs/error_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -62,22 +64,9 @@ class _LoginPageState extends State<LoginPage> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await AuthService.firebase().logIn(
-                  email: email,
-                  password: password,
-                );
-                final user = AuthService.firebase().currentUser;
-                if (user?.isEmailVerified ?? false) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    notesRoute,
-                    (route) => false,
-                  );
-                } else {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    verifyEmailRoute,
-                    (route) => false,
-                  );
-                }
+                context.read<AuthBloc>().add(
+                      AuthEventLogIn(email, password),
+                    );
               } on UserNotFoundAuthException {
                 await errorDialog(
                   context,
