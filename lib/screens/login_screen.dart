@@ -1,12 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
-import 'package:cvapp/constants/routes.dart';
 import 'package:cvapp/services/auth/bloc/auth_bloc.dart';
 import 'package:cvapp/services/auth/bloc/auth_event.dart';
 import 'package:cvapp/services/auth/bloc/auth_state.dart';
 import 'package:cvapp/services/auth/exceptions.dart';
-import 'package:cvapp/services/auth/service.dart';
 import 'package:cvapp/utilities/dialogs/error_dialog.dart';
-import 'package:cvapp/utilities/dialogs/loading_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,7 +17,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late final TextEditingController _email;
   late final TextEditingController _password;
-  CloseDialog? _closeDialogHandle;
 
   @override
   void initState() {
@@ -41,18 +37,6 @@ class _LoginPageState extends State<LoginPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateLoggedOut) {
-          final closeDialog = _closeDialogHandle;
-
-          if (!state.isLoading && closeDialog != null) {
-            closeDialog();
-            _closeDialogHandle = null;
-          } else if (state.isLoading && closeDialog == null) {
-            _closeDialogHandle = showLoadingDialog(
-              context: context,
-              text: 'loading...',
-            );
-          }
-
           if (state.exception is UserNotFoundAuthException) {
             await errorDialog(context, 'user not found');
           } else if (state.exception is WrongPasswordAuthException) {
