@@ -2,9 +2,7 @@
 
 import 'package:cvapp/services/auth/bloc/auth_bloc.dart';
 import 'package:cvapp/services/auth/bloc/auth_event.dart';
-import 'package:cvapp/services/auth/service.dart';
 import 'package:flutter/material.dart';
-import 'package:cvapp/constants/routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class VerifyEmailPage extends StatefulWidget {

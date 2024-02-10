@@ -47,51 +47,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthStateLoggedIn(user: user, isLoading: false));
       }
     });
-// on<AuthEventLogIn>((event, emit) async {
-//       emit(
-//         const AuthStateLoggedOut(
-//           exception: null,
-//           isLoading: true,
-//           loadingText: 'Please wait while I log you in',
-//         ),
-//       );
-//       final email = event.email;
-//       final password = event.password;
-//       try {
-//         final user = await provider.logIn(
-//           email: email,
-//           password: password,
-//         );
 
-//         if (!user.isEmailVerified) {
-//           emit(
-//             const AuthStateLoggedOut(
-//               exception: null,
-//               isLoading: false,
-//             ),
-//           );
-//           emit(const AuthStateNeedsVerification(isLoading: false));
-//         } else {
-//           emit(
-//             const AuthStateLoggedOut(
-//               exception: null,
-//               isLoading: false,
-//             ),
-//           );
-//           emit(AuthStateLoggedIn(
-//             user: user,
-//             isLoading: false,
-//           ));
-//         }
-//       } on Exception catch (e) {
-//         emit(
-//           AuthStateLoggedOut(
-//             exception: e,
-//             isLoading: false,
-//           ),
-//         );
-//       }
-//     });
     on<AuthEventLogIn>((event, emit) async {
       emit(
         const AuthStateLoggedOut(
